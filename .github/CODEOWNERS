@@ -5,7 +5,7 @@
 .github/workflows/ @Dorico-Dynamics/maintainers
 
 # Core library code - require review from maintainers
-**/*.go @Dorico-Dynamics/maintainers
+*.go @Dorico-Dynamics/maintainers
 go.mod @Dorico-Dynamics/maintainers
 go.sum @Dorico-Dynamics/maintainers
 

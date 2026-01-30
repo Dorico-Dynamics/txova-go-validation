@@ -27,25 +27,17 @@ jobs:
     name: Send Slack Notification
     runs-on: ubuntu-latest
     steps:
-      - name: Set notification format
-        id: format
-        env:
-          STATUS: ${{ inputs.status }}
-          VERSION: ${{ inputs.version }}
-          TRIGGERED_BY: ${{ inputs.triggered_by }}
-          ACTOR: ${{ github.actor }}
+      - name: Sanitize inputs
+        id: sanitize
         run: |
           # Sanitize inputs for JSON
           sanitize() {
             echo "$1" | jq -Rs '.' | sed 's/^"//;s/"$//'
           }
 
-          # Set version (default to N/A if empty)
-          if [ -n "$VERSION" ]; then
-            echo "version=$(sanitize "$VERSION")" >> $GITHUB_OUTPUT
-          else
-            echo "version=N/A" >> $GITHUB_OUTPUT
-          fi
+          echo "status=$(sanitize '${{ inputs.status }}')" >> $GITHUB_OUTPUT
+          echo "version=$(sanitize '${{ inputs.version }}')" >> $GITHUB_OUTPUT
+          echo "triggered_by=$(sanitize '${{ inputs.triggered_by }}')" >> $GITHUB_OUTPUT
 
           # Set triggered by (default to actor if empty)
           if [ -n "$TRIGGERED_BY" ]; then
