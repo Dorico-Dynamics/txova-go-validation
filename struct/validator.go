@@ -52,6 +52,8 @@ func initValidator() {
 	validate.RegisterValidation("txova_money", validateTxovaMoney)
 	//nolint:errcheck // Registration errors are not possible with valid inputs
 	validate.RegisterValidation("txova_rating", validateTxovaRating)
+	//nolint:errcheck // Registration errors are not possible with valid inputs
+	validate.RegisterValidation("txova_vehicle_year", validateTxovaVehicleYear)
 }
 
 // getValidator returns the singleton validator instance.
@@ -195,6 +197,9 @@ func translateSpecialTag(err validator.FieldError, field, tag string, value inte
 
 	case "txova_rating":
 		return valerrors.OutOfRangeWithValue(field, 1, 5, value), true
+
+	case "txova_vehicle_year":
+		return valerrors.OutOfRangeWithValue(field, vehicle.MinVehicleYear, "current+1", value), true
 
 	default:
 		return valerrors.ValidationError{}, false
@@ -364,4 +369,25 @@ func validateTxovaRating(fl validator.FieldLevel) bool {
 	}
 
 	return rating.ValidateRating(value) == nil
+}
+
+// validateTxovaVehicleYear validates vehicle years (2010 to current year + 1).
+func validateTxovaVehicleYear(fl validator.FieldLevel) bool {
+	field := fl.Field()
+
+	var year int
+	switch field.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		year = int(field.Int())
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		v := field.Uint()
+		if v > 9999 {
+			return false // Year values above 9999 are invalid
+		}
+		year = int(v) // #nosec G115 - bounds checked above, max value is 9999
+	default:
+		return false
+	}
+
+	return vehicle.ValidateYear(year) == nil
 }

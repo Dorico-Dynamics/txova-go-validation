@@ -2,6 +2,7 @@ package structval
 
 import (
 	"testing"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 
@@ -19,7 +20,7 @@ type UserRegistration struct {
 
 type VehicleInfo struct {
 	Plate string `json:"plate" validate:"required,mz_plate"`
-	Year  int    `json:"year" validate:"required,gte=2010,lte=2027"`
+	Year  int    `json:"year" validate:"required,txova_vehicle_year"`
 	Color string `json:"color" validate:"required,oneof=white black silver red blue"`
 }
 
@@ -608,6 +609,41 @@ func TestValidateTxovaRating(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			data := RatingTest{Rating: tt.rating}
+			errs := Validate(data)
+			if tt.wantErr && errs == nil {
+				t.Error("expected validation error")
+			}
+			if !tt.wantErr && errs != nil {
+				t.Errorf("unexpected error: %v", errs)
+			}
+		})
+	}
+}
+
+func TestValidateTxovaVehicleYear(t *testing.T) {
+	type YearTest struct {
+		Year int `json:"year" validate:"required,txova_vehicle_year"`
+	}
+
+	currentYear := time.Now().Year()
+
+	tests := []struct {
+		name    string
+		year    int
+		wantErr bool
+	}{
+		{"min year 2010", 2010, false},
+		{"current year", currentYear, false},
+		{"next year", currentYear + 1, false},
+		{"year too old", 2009, true},
+		{"year too new", currentYear + 2, true},
+		{"zero year", 0, true},
+		{"negative year", -1, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data := YearTest{Year: tt.year}
 			errs := Validate(data)
 			if tt.wantErr && errs == nil {
 				t.Error("expected validation error")
