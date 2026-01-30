@@ -27,21 +27,24 @@ jobs:
     name: Send Slack Notification
     runs-on: ubuntu-latest
     steps:
-      - name: Sanitize inputs
-        id: sanitize
+      - name: Set notification format
+        id: format
+        env:
+          STATUS: ${{ inputs.status }}
+          VERSION: ${{ inputs.version }}
+          TRIGGERED_BY: ${{ inputs.triggered_by }}
+          ACTOR: ${{ github.actor }}
         run: |
-          # Sanitize inputs for JSON
-          sanitize() {
-            echo "$1" | jq -Rs '.' | sed 's/^"//;s/"$//'
-          }
-
-          echo "status=$(sanitize '${{ inputs.status }}')" >> $GITHUB_OUTPUT
-          echo "version=$(sanitize '${{ inputs.version }}')" >> $GITHUB_OUTPUT
-          echo "triggered_by=$(sanitize '${{ inputs.triggered_by }}')" >> $GITHUB_OUTPUT
+          # Set version display (default to "N/A" if empty)
+          if [ -n "$VERSION" ] && [ "$VERSION" != "" ]; then
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "version=N/A" >> $GITHUB_OUTPUT
+          fi
 
           # Set triggered by (default to actor if empty)
-          if [ -n "$TRIGGERED_BY" ]; then
-            echo "triggered_by=$(sanitize "$TRIGGERED_BY")" >> $GITHUB_OUTPUT
+          if [ -n "$TRIGGERED_BY" ] && [ "$TRIGGERED_BY" != "" ]; then
+            echo "triggered_by=$TRIGGERED_BY" >> $GITHUB_OUTPUT
           else
             echo "triggered_by=$ACTOR" >> $GITHUB_OUTPUT
           fi
@@ -52,25 +55,21 @@ jobs:
               echo "color=#10B981" >> $GITHUB_OUTPUT
               echo "emoji=:white_check_mark:" >> $GITHUB_OUTPUT
               echo "status_text=Released Successfully" >> $GITHUB_OUTPUT
-              echo "status_icon=https://img.icons8.com/color/48/checkmark--v1.png" >> $GITHUB_OUTPUT
               ;;
             "FAILURE")
               echo "color=#EF4444" >> $GITHUB_OUTPUT
               echo "emoji=:x:" >> $GITHUB_OUTPUT
               echo "status_text=Release Failed" >> $GITHUB_OUTPUT
-              echo "status_icon=https://img.icons8.com/color/48/cancel--v1.png" >> $GITHUB_OUTPUT
               ;;
             "CANCELLED")
               echo "color=#6B7280" >> $GITHUB_OUTPUT
               echo "emoji=:no_entry_sign:" >> $GITHUB_OUTPUT
               echo "status_text=Release Cancelled" >> $GITHUB_OUTPUT
-              echo "status_icon=https://img.icons8.com/color/48/cancel-2.png" >> $GITHUB_OUTPUT
               ;;
             *)
               echo "color=#F59E0B" >> $GITHUB_OUTPUT
               echo "emoji=:warning:" >> $GITHUB_OUTPUT
-              echo "status_text=Unknown Status" >> $GITHUB_OUTPUT
-              echo "status_icon=https://img.icons8.com/color/48/error--v1.png" >> $GITHUB_OUTPUT
+              echo "status_text=Unknown Status ($STATUS)" >> $GITHUB_OUTPUT
               ;;
           esac
 
@@ -115,7 +114,7 @@ jobs:
                     },
                     {
                       "type": "mrkdwn",
-                      "text": "*Triggered By*\n@${{ steps.format.outputs.triggered_by }}"
+                      "text": "*Triggered By*\n${{ steps.format.outputs.triggered_by }}"
                     },
                     {
                       "type": "mrkdwn",
@@ -152,7 +151,7 @@ jobs:
                   "elements": [
                     {
                       "type": "mrkdwn",
-                      "text": ":github:  <https://github.com/${{ github.repository }}|${{ github.repository }}>"
+                      "text": ":link:  <https://github.com/${{ github.repository }}|${{ github.repository }}>"
                     }
                   ]
                 }
