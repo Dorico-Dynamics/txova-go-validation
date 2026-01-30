@@ -29,18 +29,14 @@ jobs:
     steps:
       - name: Sanitize inputs
         id: sanitize
-        env:
-          STATUS: ${{ inputs.status }}
-          VERSION: ${{ inputs.version }}
-          TRIGGERED_BY: ${{ inputs.triggered_by }}
         run: |
           sanitize() {
             echo "$1" | jq -Rs '.' | sed 's/^"//;s/"$//'
           }
 
-          echo "status=$(sanitize "$STATUS")" >> $GITHUB_OUTPUT
-          echo "version=$(sanitize "$VERSION")" >> $GITHUB_OUTPUT
-          echo "triggered_by=$(sanitize "$TRIGGERED_BY")" >> $GITHUB_OUTPUT
+          echo "status=$(sanitize '${{ inputs.status }}')" >> $GITHUB_OUTPUT
+          echo "version=$(sanitize '${{ inputs.version }}')" >> $GITHUB_OUTPUT
+          echo "triggered_by=$(sanitize '${{ inputs.triggered_by }}')" >> $GITHUB_OUTPUT
 
       - name: Set notification color and emoji
         id: format
