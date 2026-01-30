@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Dorico-Dynamics/txova-go-types/rating"
+
 	valerrors "github.com/Dorico-Dynamics/txova-go-validation/errors"
 )
 

@@ -93,20 +93,20 @@ func InvalidFormatWithValue(field, expected string, value interface{}) Validatio
 }
 
 // OutOfRange creates an OUT_OF_RANGE validation error.
-func OutOfRange(field string, min, max interface{}) ValidationError {
+func OutOfRange(field string, minVal, maxVal interface{}) ValidationError {
 	return ValidationError{
 		Field:   field,
 		Code:    CodeOutOfRange,
-		Message: fmt.Sprintf("%s must be between %v and %v", field, min, max),
+		Message: fmt.Sprintf("%s must be between %v and %v", field, minVal, maxVal),
 	}
 }
 
 // OutOfRangeWithValue creates an OUT_OF_RANGE validation error with the invalid value.
-func OutOfRangeWithValue(field string, min, max, value interface{}) ValidationError {
+func OutOfRangeWithValue(field string, minVal, maxVal, value interface{}) ValidationError {
 	return ValidationError{
 		Field:   field,
 		Code:    CodeOutOfRange,
-		Message: fmt.Sprintf("%s must be between %v and %v", field, min, max),
+		Message: fmt.Sprintf("%s must be between %v and %v", field, minVal, maxVal),
 		Value:   value,
 	}
 }

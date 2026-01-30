@@ -434,8 +434,8 @@ func TestValidationErrors_MarshalJSON(t *testing.T) {
 	})
 
 	t.Run("nil errors", func(t *testing.T) {
-		var errors ValidationErrors = nil
-		data, err := json.Marshal(errors)
+		var errs ValidationErrors
+		data, err := json.Marshal(errs)
 		if err != nil {
 			t.Fatalf("MarshalJSON() error = %v", err)
 		}

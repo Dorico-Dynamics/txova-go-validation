@@ -5,6 +5,7 @@ import (
 	"github.com/Dorico-Dynamics/txova-go-types/geo"
 	"github.com/Dorico-Dynamics/txova-go-types/money"
 	"github.com/Dorico-Dynamics/txova-go-types/ride"
+
 	valerrors "github.com/Dorico-Dynamics/txova-go-validation/errors"
 )
 

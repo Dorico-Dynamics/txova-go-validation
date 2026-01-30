@@ -3,6 +3,7 @@ package geo
 
 import (
 	"github.com/Dorico-Dynamics/txova-go-types/geo"
+
 	valerrors "github.com/Dorico-Dynamics/txova-go-validation/errors"
 )
 

@@ -342,37 +342,37 @@ func TestChain(t *testing.T) {
 	tests := []struct {
 		name  string
 		input string
-		fns   []SanitizeFunc
+		fns   []Func
 		want  string
 	}{
 		{
 			name:  "no functions",
 			input: "hello",
-			fns:   []SanitizeFunc{},
+			fns:   []Func{},
 			want:  "hello",
 		},
 		{
 			name:  "single function",
 			input: "  hello  ",
-			fns:   []SanitizeFunc{TrimWhitespace},
+			fns:   []Func{TrimWhitespace},
 			want:  "hello",
 		},
 		{
 			name:  "multiple functions",
 			input: "  <b>HELLO</b>  ",
-			fns:   []SanitizeFunc{StripHTML, TrimWhitespace, ToLowercase},
+			fns:   []Func{StripHTML, TrimWhitespace, ToLowercase},
 			want:  "hello",
 		},
 		{
 			name:  "order matters",
 			input: "  hello  ",
-			fns:   []SanitizeFunc{TrimWhitespace, ToUppercase},
+			fns:   []Func{TrimWhitespace, ToUppercase},
 			want:  "HELLO",
 		},
 		{
 			name:  "complex chain",
 			input: "  <p>João   Silva</p>  ",
-			fns:   []SanitizeFunc{StripHTML, NormalizeSpaces, NormalizeName},
+			fns:   []Func{StripHTML, NormalizeSpaces, NormalizeName},
 			want:  "João Silva",
 		},
 	}
@@ -567,47 +567,47 @@ func TestPrebuiltSanitizers(t *testing.T) {
 }
 
 func TestInputNotModified(t *testing.T) {
-	// Verify that all functions return new values and don't modify input
+	// Verify that all functions return new values and don't modify input.
 	original := "  <b>HELLO</b>  "
-	copy := original
+	input := original
 
-	_ = TrimWhitespace(copy)
-	if copy != original {
+	_ = TrimWhitespace(input)
+	if input != original {
 		t.Error("TrimWhitespace modified input")
 	}
 
-	_ = NormalizeSpaces(copy)
-	if copy != original {
+	_ = NormalizeSpaces(input)
+	if input != original {
 		t.Error("NormalizeSpaces modified input")
 	}
 
-	_ = StripHTML(copy)
-	if copy != original {
+	_ = StripHTML(input)
+	if input != original {
 		t.Error("StripHTML modified input")
 	}
 
-	_ = EscapeHTML(copy)
-	if copy != original {
+	_ = EscapeHTML(input)
+	if input != original {
 		t.Error("EscapeHTML modified input")
 	}
 
-	_ = NormalizeName(copy)
-	if copy != original {
+	_ = NormalizeName(input)
+	if input != original {
 		t.Error("NormalizeName modified input")
 	}
 
-	_ = NormalizeEmail(copy)
-	if copy != original {
+	_ = NormalizeEmail(input)
+	if input != original {
 		t.Error("NormalizeEmail modified input")
 	}
 
-	_ = ToUppercase(copy)
-	if copy != original {
+	_ = ToUppercase(input)
+	if input != original {
 		t.Error("ToUppercase modified input")
 	}
 
-	_ = ToLowercase(copy)
-	if copy != original {
+	_ = ToLowercase(input)
+	if input != original {
 		t.Error("ToLowercase modified input")
 	}
 }

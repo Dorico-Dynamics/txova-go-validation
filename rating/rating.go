@@ -7,6 +7,7 @@ import (
 	"unicode"
 
 	"github.com/Dorico-Dynamics/txova-go-types/rating"
+
 	valerrors "github.com/Dorico-Dynamics/txova-go-validation/errors"
 )
 
@@ -49,10 +50,9 @@ func ValidateReviewText(text string) error {
 	return nil
 }
 
-// SanitizeReviewText sanitizes review text by:
-// - Stripping HTML tags
-// - Normalizing whitespace (collapsing multiple spaces)
-// - Trimming leading/trailing whitespace
+// SanitizeReviewText sanitizes review text by stripping HTML tags,
+// normalizing whitespace (collapsing multiple spaces), and trimming
+// leading/trailing whitespace.
 func SanitizeReviewText(text string) string {
 	// Strip HTML tags
 	result := htmlTagPattern.ReplaceAllString(text, "")

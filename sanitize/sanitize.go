@@ -33,7 +33,7 @@ func StripHTML(s string) string {
 }
 
 // EscapeHTML escapes HTML special characters to their entity equivalents.
-// Escapes: & < > " '
+// Escapes: & < > " '.
 func EscapeHTML(s string) string {
 	var result strings.Builder
 	result.Grow(len(s))
@@ -57,10 +57,8 @@ func EscapeHTML(s string) string {
 	return result.String()
 }
 
-// NormalizeName normalizes a name by:
-// - Trimming whitespace
-// - Collapsing multiple spaces
-// - Capitalizing the first letter of each word
+// NormalizeName normalizes a name by trimming whitespace,
+// collapsing multiple spaces, and capitalizing the first letter of each word.
 func NormalizeName(s string) string {
 	s = NormalizeSpaces(s)
 	if s == "" {
@@ -69,7 +67,7 @@ func NormalizeName(s string) string {
 
 	words := strings.Fields(s)
 	for i, word := range words {
-		if len(word) > 0 {
+		if word != "" {
 			runes := []rune(word)
 			runes[0] = unicode.ToUpper(runes[0])
 			for j := 1; j < len(runes); j++ {
@@ -81,9 +79,8 @@ func NormalizeName(s string) string {
 	return strings.Join(words, " ")
 }
 
-// NormalizeEmail normalizes an email address by:
-// - Trimming whitespace
-// - Converting to lowercase
+// NormalizeEmail normalizes an email address by trimming whitespace
+// and converting to lowercase.
 func NormalizeEmail(s string) string {
 	return strings.ToLower(strings.TrimSpace(s))
 }
@@ -164,12 +161,12 @@ func KeepAlphanumeric(s string) string {
 	return result.String()
 }
 
-// SanitizeFunc is a function type for sanitization operations.
-type SanitizeFunc func(string) string
+// Func is a function type for sanitization operations.
+type Func func(string) string
 
 // Chain applies multiple sanitization functions in sequence.
 // Functions are applied left to right.
-func Chain(input string, fns ...SanitizeFunc) string {
+func Chain(input string, fns ...Func) string {
 	result := input
 	for _, fn := range fns {
 		result = fn(result)
@@ -179,13 +176,13 @@ func Chain(input string, fns ...SanitizeFunc) string {
 
 // Sanitizer provides a chainable API for building sanitization pipelines.
 type Sanitizer struct {
-	fns []SanitizeFunc
+	fns []Func
 }
 
 // NewSanitizer creates a new Sanitizer instance.
 func NewSanitizer() *Sanitizer {
 	return &Sanitizer{
-		fns: make([]SanitizeFunc, 0),
+		fns: make([]Func, 0),
 	}
 }
 
@@ -262,7 +259,7 @@ func (s *Sanitizer) KeepAlphanumeric() *Sanitizer {
 }
 
 // Custom adds a custom sanitization function to the pipeline.
-func (s *Sanitizer) Custom(fn SanitizeFunc) *Sanitizer {
+func (s *Sanitizer) Custom(fn Func) *Sanitizer {
 	s.fns = append(s.fns, fn)
 	return s
 }

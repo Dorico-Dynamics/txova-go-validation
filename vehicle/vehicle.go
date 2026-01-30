@@ -2,9 +2,11 @@
 package vehicle
 
 import (
+	"errors"
 	"time"
 
 	"github.com/Dorico-Dynamics/txova-go-types/vehicle"
+
 	valerrors "github.com/Dorico-Dynamics/txova-go-validation/errors"
 )
 
@@ -18,7 +20,7 @@ const (
 func ValidatePlate(input string) error {
 	_, err := vehicle.ParseLicensePlate(input)
 	if err != nil {
-		if err == vehicle.ErrInvalidProvinceCode {
+		if errors.Is(err, vehicle.ErrInvalidProvinceCode) {
 			return valerrors.InvalidFormat("plate", "valid Mozambique province code")
 		}
 		return valerrors.InvalidFormatWithValue("plate", "AAA-NNN-LL or LL-NN-NN", input)
@@ -31,7 +33,7 @@ func ValidatePlate(input string) error {
 func NormalizePlate(input string) (string, error) {
 	plate, err := vehicle.ParseLicensePlate(input)
 	if err != nil {
-		if err == vehicle.ErrInvalidProvinceCode {
+		if errors.Is(err, vehicle.ErrInvalidProvinceCode) {
 			return "", valerrors.InvalidFormat("plate", "valid Mozambique province code")
 		}
 		return "", valerrors.InvalidFormatWithValue("plate", "AAA-NNN-LL or LL-NN-NN", input)

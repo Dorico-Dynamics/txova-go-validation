@@ -2,6 +2,7 @@
 package structval
 
 import (
+	"errors"
 	"reflect"
 	"strings"
 	"sync"
@@ -37,13 +38,20 @@ func initValidator() {
 		return name
 	})
 
-	// Register custom validation tags
-	_ = validate.RegisterValidation("mz_phone", validateMzPhone)
-	_ = validate.RegisterValidation("mz_plate", validateMzPlate)
-	_ = validate.RegisterValidation("mz_location", validateMzLocation)
-	_ = validate.RegisterValidation("txova_pin", validateTxovaPin)
-	_ = validate.RegisterValidation("txova_money", validateTxovaMoney)
-	_ = validate.RegisterValidation("txova_rating", validateTxovaRating)
+	// Register custom validation tags.
+	// These registrations cannot fail as they are valid tag names with valid functions.
+	//nolint:errcheck // Registration errors are not possible with valid inputs
+	validate.RegisterValidation("mz_phone", validateMzPhone)
+	//nolint:errcheck // Registration errors are not possible with valid inputs
+	validate.RegisterValidation("mz_plate", validateMzPlate)
+	//nolint:errcheck // Registration errors are not possible with valid inputs
+	validate.RegisterValidation("mz_location", validateMzLocation)
+	//nolint:errcheck // Registration errors are not possible with valid inputs
+	validate.RegisterValidation("txova_pin", validateTxovaPin)
+	//nolint:errcheck // Registration errors are not possible with valid inputs
+	validate.RegisterValidation("txova_money", validateTxovaMoney)
+	//nolint:errcheck // Registration errors are not possible with valid inputs
+	validate.RegisterValidation("txova_rating", validateTxovaRating)
 }
 
 // getValidator returns the singleton validator instance.
@@ -62,15 +70,15 @@ func Validate(s interface{}) valerrors.ValidationErrors {
 		return nil
 	}
 
-	validationErrors, ok := err.(validator.ValidationErrors)
-	if !ok {
-		// Unexpected error type, wrap it
-		return valerrors.ValidationErrors{
-			valerrors.New("_", valerrors.CodeInvalidFormat, err.Error()),
-		}
+	var validationErrors validator.ValidationErrors
+	if errors.As(err, &validationErrors) {
+		return translateErrors(validationErrors)
 	}
 
-	return translateErrors(validationErrors)
+	// Unexpected error type, wrap it.
+	return valerrors.ValidationErrors{
+		valerrors.New("_", valerrors.CodeInvalidFormat, err.Error()),
+	}
 }
 
 // ValidateVar validates a single variable against a tag.
@@ -83,14 +91,14 @@ func ValidateVar(field interface{}, tag string) valerrors.ValidationErrors {
 		return nil
 	}
 
-	validationErrors, ok := err.(validator.ValidationErrors)
-	if !ok {
-		return valerrors.ValidationErrors{
-			valerrors.New("value", valerrors.CodeInvalidFormat, err.Error()),
-		}
+	var validationErrors validator.ValidationErrors
+	if errors.As(err, &validationErrors) {
+		return translateErrors(validationErrors)
 	}
 
-	return translateErrors(validationErrors)
+	return valerrors.ValidationErrors{
+		valerrors.New("value", valerrors.CodeInvalidFormat, err.Error()),
+	}
 }
 
 // RegisterValidation registers a custom validation function.
@@ -119,65 +127,100 @@ func translateError(err validator.FieldError) valerrors.ValidationError {
 	tag := err.Tag()
 	value := err.Value()
 
+	// Handle special cases that need parameter access.
+	if ve, ok := translateSpecialTag(err, field, tag, value); ok {
+		return ve
+	}
+
+	// Handle simple format tags.
+	if expected, ok := formatTagExpectations[tag]; ok {
+		return valerrors.InvalidFormatWithValue(field, expected, value)
+	}
+
+	// Handle range tags.
+	if isLowerBoundTag(tag) {
+		return valerrors.OutOfRangeWithValue(field, err.Param(), "∞", value)
+	}
+	if isUpperBoundTag(tag) {
+		return valerrors.OutOfRangeWithValue(field, "-∞", err.Param(), value)
+	}
+
+	// Default: use tag as expected format.
+	return valerrors.InvalidFormatWithValue(field, tag, value)
+}
+
+// formatTagExpectations maps validation tags to expected format descriptions.
+var formatTagExpectations = map[string]string{
+	"email":     "valid email address",
+	"url":       "valid URL",
+	"mz_phone":  "valid Mozambique phone number",
+	"mz_plate":  "valid Mozambique license plate",
+	"txova_pin": "4-digit PIN (no sequential or repeated)",
+}
+
+// isLowerBoundTag returns true if the tag is a lower bound validation.
+func isLowerBoundTag(tag string) bool {
+	return tag == "gt" || tag == "gte"
+}
+
+// isUpperBoundTag returns true if the tag is an upper bound validation.
+func isUpperBoundTag(tag string) bool {
+	return tag == "lt" || tag == "lte"
+}
+
+// translateSpecialTag handles tags that need special processing.
+func translateSpecialTag(err validator.FieldError, field, tag string, value interface{}) (valerrors.ValidationError, bool) {
 	switch tag {
 	case "required":
-		return valerrors.Required(field)
+		return valerrors.Required(field), true
 
 	case "min":
-		param := err.Param()
-		if err.Kind() == reflect.String {
-			return valerrors.TooShortWithValue(field, parseIntParam(param), len(value.(string)))
-		}
-		return valerrors.OutOfRangeWithValue(field, param, "∞", value)
+		return translateMinTag(err, field, value), true
 
 	case "max":
-		param := err.Param()
-		if err.Kind() == reflect.String {
-			return valerrors.TooLongWithValue(field, parseIntParam(param), len(value.(string)))
-		}
-		return valerrors.OutOfRangeWithValue(field, "-∞", param, value)
+		return translateMaxTag(err, field, value), true
 
 	case "len":
-		param := err.Param()
-		return valerrors.InvalidFormatWithValue(field, "length "+param, value)
-
-	case "email":
-		return valerrors.InvalidFormatWithValue(field, "valid email address", value)
-
-	case "url":
-		return valerrors.InvalidFormatWithValue(field, "valid URL", value)
+		return valerrors.InvalidFormatWithValue(field, "length "+err.Param(), value), true
 
 	case "oneof":
 		options := strings.Split(err.Param(), " ")
-		return valerrors.InvalidOptionWithValue(field, options, value)
-
-	case "gt", "gte":
-		return valerrors.OutOfRangeWithValue(field, err.Param(), "∞", value)
-
-	case "lt", "lte":
-		return valerrors.OutOfRangeWithValue(field, "-∞", err.Param(), value)
-
-	case "mz_phone":
-		return valerrors.InvalidFormatWithValue(field, "valid Mozambique phone number", value)
-
-	case "mz_plate":
-		return valerrors.InvalidFormatWithValue(field, "valid Mozambique license plate", value)
+		return valerrors.InvalidOptionWithValue(field, options, value), true
 
 	case "mz_location":
-		return valerrors.OutsideServiceArea(field)
-
-	case "txova_pin":
-		return valerrors.InvalidFormatWithValue(field, "4-digit PIN (no sequential or repeated)", value)
+		return valerrors.OutsideServiceArea(field), true
 
 	case "txova_money":
-		return valerrors.OutOfRangeWithValue(field, 1, "∞", value)
+		return valerrors.OutOfRangeWithValue(field, 1, "∞", value), true
 
 	case "txova_rating":
-		return valerrors.OutOfRangeWithValue(field, 1, 5, value)
+		return valerrors.OutOfRangeWithValue(field, 1, 5, value), true
 
 	default:
-		return valerrors.InvalidFormatWithValue(field, tag, value)
+		return valerrors.ValidationError{}, false
 	}
+}
+
+// translateMinTag handles the "min" validation tag.
+func translateMinTag(err validator.FieldError, field string, value interface{}) valerrors.ValidationError {
+	param := err.Param()
+	if err.Kind() == reflect.String {
+		if s, ok := value.(string); ok {
+			return valerrors.TooShortWithValue(field, parseIntParam(param), len(s))
+		}
+	}
+	return valerrors.OutOfRangeWithValue(field, param, "∞", value)
+}
+
+// translateMaxTag handles the "max" validation tag.
+func translateMaxTag(err validator.FieldError, field string, value interface{}) valerrors.ValidationError {
+	param := err.Param()
+	if err.Kind() == reflect.String {
+		if s, ok := value.(string); ok {
+			return valerrors.TooLongWithValue(field, parseIntParam(param), len(s))
+		}
+	}
+	return valerrors.OutOfRangeWithValue(field, "-∞", param, value)
 }
 
 // parseIntParam parses a string parameter to int, returning 0 on error.
