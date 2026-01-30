@@ -55,36 +55,36 @@ This library depends on `txova-go-types` for domain invariant types. The validat
 
 ---
 
-## Phase 2: Phone & Geographic Validation (Week 2)
+## Phase 2: Phone & Geographic Validation (Week 2) - COMPLETE
 
-### 2.1 Package: `phone` - Phone Number Validation
-- [ ] Implement `Validate(input string) bool` - returns true if valid Mozambique number
-- [ ] Implement `Normalize(input string) (string, error)` - normalizes to +258XXXXXXXXX
-- [ ] Implement `IdentifyOperator(input string) string` - returns operator name
-- [ ] Handle all input formats: local (841234567), international (+258841234567), with country code (258841234567), with 00 prefix (00258841234567), with spaces (84 123 4567)
-- [ ] Strip non-digit characters except leading +
-- [ ] Validate prefix is 82, 83, 84, 85, 86, or 87
-- [ ] Use `types/contact.PhoneNumber` for final parsing and `types/contact.Operator` for operator identification
-- [ ] Write tests covering all input format variations
-
-**Deliverables:**
-- [ ] `phone/` package with validation and normalization
-- [ ] Test suite with format normalization matrix
-
-### 2.2 Package: `geo` - Geographic Validation
-- [ ] Implement `ValidateCoordinates(lat, lon float64) error` - checks global valid ranges
-- [ ] Implement `ValidateInMozambique(lat, lon float64) error` - checks Mozambique bounds
-- [ ] Implement `ValidateServiceArea(lat, lon float64, area string) error` - checks city service areas
-- [ ] Define service area bounds for Maputo, Matola, Beira
-- [ ] Use `types/geo.Location` for coordinate types
-- [ ] Use `types/geo.BoundingBox` for containment checks
-- [ ] Return specific error codes (OUTSIDE_SERVICE_AREA vs OUT_OF_RANGE)
-- [ ] Implement `GetServiceAreas() []string` - returns list of active service areas
-- [ ] Write tests with real Mozambique coordinates
+### 2.1 Package: `phone` - Phone Number Validation - COMPLETE (90.2% coverage)
+- [x] Implement `Validate(input string) bool` - returns true if valid Mozambique number
+- [x] Implement `Normalize(input string) (string, error)` - normalizes to +258XXXXXXXXX
+- [x] Implement `IdentifyOperator(input string) string` - returns operator name
+- [x] Handle all input formats: local (841234567), international (+258841234567), with country code (258841234567), with 00 prefix (00258841234567), with spaces (84 123 4567)
+- [x] Strip non-digit characters except leading +
+- [x] Validate prefix is 82, 83, 84, 85, 86, or 87
+- [x] Use `types/contact.PhoneNumber` for final parsing and `types/contact.Operator` for operator identification
+- [x] Write tests covering all input format variations
 
 **Deliverables:**
-- [ ] `geo/` package with coordinate and service area validation
-- [ ] Test suite with boundary edge cases
+- [x] `phone/` package with validation and normalization
+- [x] Test suite with format normalization matrix
+
+### 2.2 Package: `geo` - Geographic Validation - COMPLETE (100% coverage)
+- [x] Implement `ValidateCoordinates(lat, lon float64) error` - checks global valid ranges
+- [x] Implement `ValidateInMozambique(lat, lon float64) error` - checks Mozambique bounds
+- [x] Implement `ValidateServiceArea(lat, lon float64, area string) error` - checks city service areas
+- [x] Define service area bounds for Maputo, Matola, Beira
+- [x] Use `types/geo.Location` for coordinate types
+- [x] Use `types/geo.DistanceKM` for distance calculations
+- [x] Return specific error codes (OUTSIDE_SERVICE_AREA vs OUT_OF_RANGE)
+- [x] Implement `GetServiceAreas() []string` - returns list of active service areas
+- [x] Write tests with real Mozambique coordinates
+
+**Deliverables:**
+- [x] `geo/` package with coordinate and service area validation
+- [x] Test suite with boundary edge cases
 
 ---
 
