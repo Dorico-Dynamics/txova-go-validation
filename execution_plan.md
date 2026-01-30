@@ -88,34 +88,34 @@ This library depends on `txova-go-types` for domain invariant types. The validat
 
 ---
 
-## Phase 3: Vehicle & Ride Validation (Week 3)
+## Phase 3: Vehicle & Ride Validation (Week 3) - COMPLETE
 
-### 3.1 Package: `vehicle` - Vehicle Validation
-- [ ] Implement `ValidatePlate(input string) error` - validates Mozambique plate format
-- [ ] Implement `NormalizePlate(input string) (string, error)` - normalizes to standard format
-- [ ] Implement `ValidateYear(year int) error` - validates vehicle year (2010 to current+1)
-- [ ] Support standard format (AAA-NNN-LL) and old format (AA-NN-NN)
-- [ ] Use `types/vehicle.LicensePlate` for parsing and format validation
-- [ ] Use `types/vehicle.ProvinceCode` for province validation
-- [ ] Normalize: uppercase, add dashes if missing
-- [ ] Write tests for both plate formats and year edge cases
-
-**Deliverables:**
-- [ ] `vehicle/` package with plate and year validation
-- [ ] Test suite covering format variations
-
-### 3.2 Package: `ride` - Ride Validation
-- [ ] Implement `ValidatePIN(input string) error` - validates 4-digit PIN format
-- [ ] Use `types/ride.PIN` for PIN parsing and invariant validation (no sequential, no repeated)
-- [ ] Implement `ValidateDistance(km float64) error` - validates distance (0.5 to 200 km)
-- [ ] Implement `ValidateFare(amount int64) error` - validates fare (50 to 50,000 MZN in centavos)
-- [ ] Implement `ValidatePickupDropoff(pickup, dropoff types/geo.Location) error` - ensures minimum separation
-- [ ] Use `types/money.Money` for fare validation
-- [ ] Write tests for all validation rules
+### 3.1 Package: `vehicle` - Vehicle Validation - COMPLETE (100% coverage)
+- [x] Implement `ValidatePlate(input string) error` - validates Mozambique plate format
+- [x] Implement `NormalizePlate(input string) (string, error)` - normalizes to standard format
+- [x] Implement `ValidateYear(year int) error` - validates vehicle year (2010 to current+1)
+- [x] Support standard format (AAA-NNN-LL) and old format (AA-NN-NN)
+- [x] Use `types/vehicle.LicensePlate` for parsing and format validation
+- [x] Use `types/vehicle.ProvinceCode` for province validation
+- [x] Normalize: uppercase, add dashes if missing
+- [x] Write tests for both plate formats and year edge cases
 
 **Deliverables:**
-- [ ] `ride/` package with ride request validation
-- [ ] Test suite covering distance, fare, and PIN rules
+- [x] `vehicle/` package with plate and year validation
+- [x] Test suite covering format variations
+
+### 3.2 Package: `ride` - Ride Validation - COMPLETE (100% coverage)
+- [x] Implement `ValidatePIN(input string) error` - validates 4-digit PIN format
+- [x] Use `types/ride.PIN` for PIN parsing and invariant validation (no sequential, no repeated)
+- [x] Implement `ValidateDistance(km float64) error` - validates distance (0.5 to 200 km)
+- [x] Implement `ValidateFare(amount int64) error` - validates fare (50 to 50,000 MZN in centavos)
+- [x] Implement `ValidatePickupDropoff(pickup, dropoff types/geo.Location) error` - ensures minimum separation
+- [x] Use `types/money.Money` for fare validation
+- [x] Write tests for all validation rules
+
+**Deliverables:**
+- [x] `ride/` package with ride request validation
+- [x] Test suite covering distance, fare, and PIN rules
 
 ---
 
