@@ -1,0 +1,180 @@
+version: "2"
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  default: none
+  enable:
+    # Default linters
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    # Additional linters
+    - bodyclose
+    - copyloopvar
+    - dupl
+    - durationcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - forbidigo
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - goprintffuncname
+    - gosec
+    - intrange
+    - makezero
+    - misspell
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnil
+    - noctx
+    - nolintlint
+    - prealloc
+    - predeclared
+    - revive
+    - rowserrcheck
+    - sqlclosecheck
+    - testableexamples
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - whitespace
+
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+
+    errorlint:
+      errorf: true
+      asserts: true
+      comparison: true
+
+    exhaustive:
+      default-signifies-exhaustive: true
+
+    gocyclo:
+      min-complexity: 15
+
+    goconst:
+      min-len: 3
+      min-occurrences: 3
+
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - performance
+        - style
+
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+
+    nakedret:
+      max-func-lines: 30
+
+    nestif:
+      min-complexity: 4
+
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+
+    revive:
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: error-return
+        - name: error-strings
+        - name: error-naming
+        - name: exported
+        - name: increment-decrement
+        - name: indent-error-flow
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: time-naming
+        - name: unexported-return
+        - name: var-declaration
+        - name: var-naming
+
+    staticcheck:
+      checks:
+        - all
+
+    unparam:
+      check-exported: true
+
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - std-error-handling
+    rules:
+      - path: _test\.go
+        linters:
+          - dupl
+          - goconst
+          - gosec
+          - unparam
+          - errcheck
+          - gocyclo
+          - errorlint
+          - nestif
+
+      - path: _test\.go
+        text: "fieldalignment"
+
+      # MarshalText/MarshalJSON/Value methods return nil error by design (interface requirement)
+      - text: "result 1 \\(error\\) is always nil"
+        linters:
+          - unparam
+
+      # Return nil, nil is intentional for optional values in driver.Valuer interface
+      - text: "return both a `nil` error and an invalid value"
+        linters:
+          - nilnil
+
+      # godot: test file comments don't need periods
+      - path: _test\.go
+        linters:
+          - godot
+
+      # sanitize package has intentionally similar functions
+      - path: sanitize/sanitize\.go
+        linters:
+          - dupl
+
+      # errors package name conflicts with stdlib but is intentional for this validation library
+      - path: errors/
+        text: "avoid package names that conflict with Go standard library"
+        linters:
+          - revive
+
+      # struct validator registration errors are intentionally ignored (valid inputs always succeed)
+      - path: struct/validator\.go
+        text: "G104: Errors unhandled"
+        linters:
+          - gosec
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/Dorico-Dynamics/txova-go-validation
