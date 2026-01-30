@@ -91,17 +91,17 @@ Where: A=letter, N=number, L=province code
 **Province Codes:**
 | Code | Province |
 |------|----------|
-| MZ | Maputo City |
-| MC | Maputo Province |
-| GA | Gaza |
-| IN | Inhambane |
-| SO | Sofala |
-| MA | Manica |
-| TE | Tete |
-| ZA | Zambezia |
-| NA | Nampula |
-| CD | Cabo Delgado |
-| NI | Niassa |
+| MC | Maputo City |
+| MP | Maputo Province |
+| GZ | Gaza |
+| IB | Inhambane |
+| SF | Sofala |
+| MN | Manica |
+| TT | Tete |
+| ZB | Zambezia |
+| NP | Nampula |
+| CA | Cabo Delgado |
+| NS | Niassa |
 
 **Vehicle Year Validation:**
 | Rule | Value |
