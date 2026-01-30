@@ -305,9 +305,17 @@ func validateTxovaRating(fl validator.FieldLevel) bool {
 	var value int
 	switch field.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		value = int(field.Int())
+		v := field.Int()
+		if v < 0 || v > 5 {
+			return false
+		}
+		value = int(v)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		value = int(field.Uint())
+		v := field.Uint()
+		if v > 5 {
+			return false
+		}
+		value = int(v) // #nosec G115 - bounds checked above, max value is 5
 	default:
 		return false
 	}

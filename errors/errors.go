@@ -276,7 +276,7 @@ func (ve *ValidationErrors) AddAll(errs ValidationErrors) {
 
 // MarshalJSON implements json.Marshaler for API responses.
 func (ve ValidationErrors) MarshalJSON() ([]byte, error) {
-	if ve == nil || len(ve) == 0 {
+	if len(ve) == 0 {
 		return []byte("[]"), nil
 	}
 	return json.Marshal([]ValidationError(ve))
