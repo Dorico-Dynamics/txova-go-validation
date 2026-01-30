@@ -119,33 +119,33 @@ This library depends on `txova-go-types` for domain invariant types. The validat
 
 ---
 
-## Phase 4: Rating & Document Validation (Week 4)
+## Phase 4: Rating & Document Validation (Week 4) - COMPLETE
 
-### 4.1 Package: `rating` - Rating Validation
-- [ ] Implement `ValidateRating(value int) error` - validates 1-5 range
-- [ ] Use `types/rating.Rating` for range validation
-- [ ] Implement `ValidateReviewText(text string) error` - validates length (0-500 chars)
-- [ ] Implement `SanitizeReviewText(text string) string` - strips HTML, normalizes whitespace
-- [ ] Implement `CheckProfanity(text string) bool` - flags potential profanity for moderation
-- [ ] Load profanity word list (Portuguese and English common terms)
-- [ ] Write tests for rating validation and text sanitization
-
-**Deliverables:**
-- [ ] `rating/` package with rating and review validation
-- [ ] Test suite covering edge cases and profanity detection
-
-### 4.2 Package: `document` - Document Validation
-- [ ] Define document type constants (driver_license, vehicle_registration, insurance, id_card, profile_photo, vehicle_photo)
-- [ ] Implement `ValidateFileSize(size int64, docType string) error` - validates max size by type
-- [ ] Implement `ValidateMIMEType(mimeType, extension string) error` - validates MIME matches extension
-- [ ] Implement `ValidateImageDimensions(width, height int) error` - validates 200x200 to 4096x4096
-- [ ] Implement `ValidateAspectRatio(width, height int) error` - validates 1:4 to 4:1 ratio
-- [ ] Implement `GetAllowedFormats(docType string) []string` - returns allowed formats
-- [ ] Write tests for all document validation rules
+### 4.1 Package: `rating` - Rating Validation - COMPLETE (100% coverage)
+- [x] Implement `ValidateRating(value int) error` - validates 1-5 range
+- [x] Use `types/rating.Rating` for range validation
+- [x] Implement `ValidateReviewText(text string) error` - validates length (0-500 chars)
+- [x] Implement `SanitizeReviewText(text string) string` - strips HTML, normalizes whitespace
+- [x] Implement `CheckProfanity(text string) bool` - flags potential profanity for moderation
+- [x] Load profanity word list (Portuguese and English common terms)
+- [x] Write tests for rating validation and text sanitization
 
 **Deliverables:**
-- [ ] `document/` package with file validation
-- [ ] Test suite covering size, format, and dimension rules
+- [x] `rating/` package with rating and review validation
+- [x] Test suite covering edge cases and profanity detection
+
+### 4.2 Package: `document` - Document Validation - COMPLETE (98.4% coverage)
+- [x] Define document type constants (driver_license, vehicle_registration, insurance, id_card, profile_photo, vehicle_photo)
+- [x] Implement `ValidateFileSize(size int64, docType string) error` - validates max size by type
+- [x] Implement `ValidateMIMEType(mimeType, extension string) error` - validates MIME matches extension
+- [x] Implement `ValidateImageDimensions(width, height int) error` - validates 200x200 to 4096x4096
+- [x] Implement `ValidateAspectRatio(width, height int) error` - validates 1:4 to 4:1 ratio
+- [x] Implement `GetAllowedFormats(docType string) []string` - returns allowed formats
+- [x] Write tests for all document validation rules
+
+**Deliverables:**
+- [x] `document/` package with file validation
+- [x] Test suite covering size, format, and dimension rules
 
 ---
 
